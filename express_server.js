@@ -34,7 +34,6 @@ app.get("/login", (req, res) => {
   const templateVars = {
     username: req.cookies["username"],
   };
-  //console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -87,7 +86,6 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/login", (req, res) => {
   res.cookie("username",req.body.username);
-  //console.log(res.cookie("username",req.body.username));
   res.redirect("/urls");
 });
 
