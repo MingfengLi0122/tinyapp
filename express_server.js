@@ -4,7 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
@@ -27,7 +27,11 @@ const users = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!req.cookies.user_id) {
+    res.redirect("/login");
+    return;
+  } 
+  res.redirect("/urls");
 });
 
 app.get("/hello", (req, res) => {
@@ -44,12 +48,20 @@ app.get("/fetch", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/login");
+    return;
+  } 
   const id = req.cookies.user_id;
   const templateVars = { user: users[id] };
   res.render("user_regis", templateVars);
 });
 
 app.get("/login", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+    return;
+  } 
   const id = req.cookies.user_id;
   const templateVars = { user: users[id] };
   res.render("user_login", templateVars);
