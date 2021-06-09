@@ -117,14 +117,14 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   //console.log(users);
   if (!req.body.email || !req.body.password) {
-    res.status(400).send("Username/Password can not be empty!");
+    return res.status(400).send("Username/Password can not be empty!");
   }
   if (!isRegisted(req.body.email)) {
-    res.status(403).send("Unregistered email address!")
+    return res.status(403).send("Unregistered email address!")
   }
   if (isRegisted(req.body.email)) {
     if (isNotCorrectPassword(req.body.email, req.body.password)) {
-      res.status(403).send("Wrong password!");
+      return res.status(403).send("Wrong password!");
     }
   }
   
@@ -141,11 +141,11 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
-    res.status(400).send("Username/Password can not be empty!");
+    return res.status(400).send("Username/Password can not be empty!");
   }
 
   if (isRegisted(req.body.email)) {
-    res.status(400).send("Email address has been registerd!");
+    return res.status(400).send("Email address has been registerd!");
   } 
 
   const id = generateRandomString();

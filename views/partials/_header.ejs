@@ -10,10 +10,10 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <% if (!user) { %>
-        <div class="form-group mb-2 col-md-4 col-md-offset-4"></div>
-        <a href="http://localhost:8080/login">Login</a> 
-        <div class="form-group mb-2 col-md-4 col-md-offset-4"></div>
-        <a href="http://localhost:8080/register">Register</a> 
+        <div class="navbar-nav" style="padding-left : 70em">
+        <a href="http://localhost:8080/login" class="nav-item nav-link" >Login</a> 
+        <a href="http://localhost:8080/register" class="nav-item nav-link">Register</a> 
+        </div>
       <% } else { %> 
         <a href="http://localhost:8080/register">Register</a> 
         <form class="form-inline" style= "padding-left:  55%" action="/logout" method="POST">
