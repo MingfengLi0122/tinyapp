@@ -48,7 +48,7 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user: users[id],
   };
-  res.render("urls_index", templateVars);
+  res.render("user_login", templateVars);
 });
 
 app.get("/urls", (req, res) => {
@@ -81,7 +81,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("template");
+  res.render("user_regis");
 });
 
 app.post("/urls", (req, res) => {
@@ -109,7 +109,24 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body.user_id);
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send("Username/Password can not be empty!");
+  }
+
+  if (isRegisted(req.body.email)) {
+    res.status(400).send("Email address has been registerd!");
+  }
+
+  const id = generateRandomString();
+
+  const user = {
+    id: id,
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  users[id] = user;
+  res.cookie("user_id", id);
   res.redirect("/urls");
 });
 
@@ -135,6 +152,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
+
   users[id] = user;
   res.cookie("user_id", id);
   res.redirect("/urls");
