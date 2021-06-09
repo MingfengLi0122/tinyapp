@@ -43,6 +43,14 @@ app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 });
 
+app.get("/register", (req, res) => {
+  const id = req.cookies.user_id;
+  const templateVars = {
+    user: users[id],
+  };
+  res.render("user_regis", templateVars);
+});
+
 app.get("/login", (req, res) => {
   const id = req.cookies.user_id;
   const templateVars = {
@@ -62,7 +70,9 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const id = req.cookies.user_id;
+  const templateVars = { urls: urlDatabase, user: users[id] ,};
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -78,10 +88,6 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
-});
-
-app.get("/register", (req, res) => {
-  res.render("user_regis");
 });
 
 app.post("/urls", (req, res) => {
@@ -109,29 +115,26 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  //console.log(users);
   if (!req.body.email || !req.body.password) {
     res.status(400).send("Username/Password can not be empty!");
   }
-
-  if (isRegisted(req.body.email)) {
-    res.status(400).send("Email address has been registerd!");
+  if (!isRegisted(req.body.email)) {
+    res.status(403).send("Unregistered email address!")
   }
+  if (isRegisted(req.body.email)) {
+    if (isNotCorrectPassword(req.body.email, req.body.password)) {
+      res.status(403).send("Wrong password!");
+    }
+  }
+  
+  const userId = checkUserId(req.body.email, req.body.password);
 
-  const id = generateRandomString();
-
-  const user = {
-    id: id,
-    email: req.body.email,
-    password: req.body.password,
-  };
-
-  users[id] = user;
-  res.cookie("user_id", id);
+  res.cookie("user_id", userId);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  console.log(req.cookies);
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
@@ -143,7 +146,7 @@ app.post("/register", (req, res) => {
 
   if (isRegisted(req.body.email)) {
     res.status(400).send("Email address has been registerd!");
-  }
+  } 
 
   const id = generateRandomString();
 
@@ -157,6 +160,23 @@ app.post("/register", (req, res) => {
   res.cookie("user_id", id);
   res.redirect("/urls");
 });
+
+function checkUserId(email, password) {
+  for (let user in users) {
+    if (users[user].email === email && users[user].password === password) {
+      console.log("matched user id:", user);
+      return user;
+    }
+  }
+}
+
+function isNotCorrectPassword(email, password) {
+  for (let user in users) {
+    if (users[user].email === email && users[user].password !== password) {
+      return true;
+    }
+  }
+}
 
 function isRegisted(email) {
   for (let user in users) {
