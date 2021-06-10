@@ -20,15 +20,16 @@ const checkUserId = function(email, password, users) {
   }
 }
 
-function isRegisted(email, users) {
+const isRegisted = function(email, users) {
   for (let user in users) {
     if (users[user].email === email) {
       return true;
     }
   }
+  return false;
 }
 
-function generateRandomString() {
+const generateRandomString = function() {
   return Math.random().toString(36).substring(7);
 }
 
@@ -40,7 +41,7 @@ const getUserByEmail = function(email, database) {
     }
   }
   return user;
-};
+}
 
 
 module.exports = { getUserByEmail, generateRandomString, isRegisted, checkUserId, filter };

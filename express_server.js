@@ -27,7 +27,7 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "$2b$10$.2AfTtME1AlqA3ndkQ4AbuvZ0H.bAnCoa7UndQIl2fKlPq/9GvxZy", //original 123321
-  },
+  }
 };
 
 app.get("/", (req, res) => {
@@ -127,7 +127,7 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   if (!req.session.user_id) {
-    res.status(403).send("Not login yet!");
+    res.status(401).send("Not login yet!");
     return;
   }
   const shortURL = generateRandomString();
@@ -146,11 +146,11 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
   if (!req.session.user_id) {
-    res.status(403).send("Not login yet!");
+    res.status(401).send("Not login yet!");
     return;
   }
   if (!urlDatabase[req.params.id]) {
-    res.status(404).send("Do not own this url!");
+    res.status(403).send("Do not own this url!");
     return;
   }
 
