@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
+const { getUserByEmail, generateRandomString, isRegisted, checkUserId, filter } = require("./helpers");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
@@ -65,12 +66,17 @@ app.get("/login", (req, res) => {
     res.redirect("/urls");
     return;
   } 
+  
   const id = req.session.user_id;
   const templateVars = { user: users[id] };
   res.render("user_login", templateVars);
 });
 
 app.get("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    res.status(403).send("Not login yet!");
+    return;
+  }
   const id = req.session.user_id;
   let filteredDataBase = filter(urlDatabase, id);
   const templateVars = { urls: filteredDataBase, user: users[id] };
@@ -92,6 +98,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  if (!req.session.user_id) {
+    res.status(403).send("Not login yet!");
+    return;
+  }
+  
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("Do not own this url!");
+    return;
+  }
   const id = req.session.user_id;
   const templateVars = {
     shortURL: req.params.id,
@@ -102,13 +117,21 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const id = req.session.user_id;
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("Do not own this url!");
+    return;
+  }
   const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
 
 app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    res.status(403).send("Not login yet!");
+    return;
+  }
   const shortURL = generateRandomString();
+ 
   urlDatabase[shortURL] = { 
     longURL: req.body.longURL, 
     userID: req.session.user_id
@@ -116,8 +139,21 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+app.post("/urls/:id", (req, res) => {
+  const shortURL = req.params.id;
+  res.redirect("/urls/");
+});
+
 app.post("/urls/:id/delete", (req, res) => {
-  const shortURL = req.params.shortURL;
+  if (!req.session.user_id) {
+    res.status(403).send("Not login yet!");
+    return;
+  }
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("Do not own this url!");
+    return;
+  }
+
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
@@ -127,11 +163,6 @@ app.post("/urls/:id/edit", (req, res) => {
   const longURL = req.body.longURL;
   urlDatabase[shortURL].longURL = longURL;
   res.redirect("/urls");
-});
-
-app.post("/urls/:id", (req, res) => {
-  const shortURL = req.params.id;
-  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/login", (req, res) => {
@@ -147,19 +178,17 @@ app.post("/login", (req, res) => {
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
   if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
-    res.status(403).send("Wrong password!");
+    res.status(403).send("Wrong Username/Password!");
     return;
   }
   
   const userId = checkUserId(req.body.email, req.body.password);
 
-  //res.cookie("user_id", userId);
   req.session.user_id = userId;
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  //res.clearCookie("user_id");
   req.session = null;
   res.redirect("/urls");
 });
@@ -187,42 +216,9 @@ app.post("/register", (req, res) => {
 
   users[id] = user;
 
-  //res.cookie("user_id", id);
   req.session.user_id = id;
   res.redirect("/urls");
 });
-
-function filter(urlDatabase, userId) {
-  let res = {};
-  if (userId) {
-    for (let shortURL in urlDatabase) {
-      if (urlDatabase[shortURL].userID === userId) {
-        res[shortURL] = urlDatabase[shortURL].longURL;
-      }
-    }
-  }
-  return res;
-}
-
-function checkUserId(email, password) {
-  for (let user in users) {
-    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
-      return user;
-    }
-  }
-}
-
-function isRegisted(email) {
-  for (let user in users) {
-    if (users[user].email === email) {
-      return true;
-    }
-  }
-}
-
-function generateRandomString() {
-  return Math.random().toString(36).substring(7);
-}
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
