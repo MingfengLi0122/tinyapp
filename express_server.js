@@ -99,7 +99,8 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
+  const id = req.cookies.user_id;
+  const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
 
@@ -139,6 +140,7 @@ app.post("/login", (req, res) => {
     res.status(403).send("Unregistered email address!");
     return;
   }
+  
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
   if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
