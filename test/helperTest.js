@@ -1,5 +1,4 @@
 const { assert } = require('chai');
-const bcrypt = require("bcrypt");
 const { getUserByEmail, isRegisted, checkUserId, filter } = require("../helpers");;
 
 const testUsers = {
