@@ -170,7 +170,7 @@ app.post("/login", (req, res) => {
     res.status(400).send("Username/Password can not be empty!");
     return;
   }
-  if (!isRegisted(req.body.email)) {
+  if (!isRegisted(req.body.email, users)) {
     res.status(403).send("Unregistered email address!");
     return;
   }
@@ -182,7 +182,7 @@ app.post("/login", (req, res) => {
     return;
   }
   
-  const userId = checkUserId(req.body.email, req.body.password);
+  const userId = checkUserId(req.body.email, req.body.password, users);
 
   req.session.user_id = userId;
   res.redirect("/urls");
@@ -199,7 +199,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  if (isRegisted(req.body.email)) {
+  if (isRegisted(req.body.email, users)) {
     res.status(400).send("Email address has been registerd!");
     return;
   } 
