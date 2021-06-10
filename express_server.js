@@ -3,8 +3,10 @@ const app = express();
 const PORT = 8080;
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
+const morgan = require("morgan");
 const { getUserByEmail, generateRandomString, isRegisted, checkUserId, filter } = require("./helpers");
 
+app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: "session",
