@@ -109,7 +109,9 @@ app.get("/urls/:id", (req, res) => {
     res.status(404).send("Do not own this url!");
     return;
   }
+  
   const id = req.session.user_id;
+  
   const templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
@@ -120,10 +122,12 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
-    res.status(404).send("Do not own this url!");
+    res.status(404).send("This url does not exist!");
     return;
   }
+  
   const longURL = urlDatabase[req.params.id].longURL;
+  
   res.redirect(longURL);
 });
 
@@ -132,6 +136,7 @@ app.post("/urls", (req, res) => {
     res.status(401).send("Not login yet!");
     return;
   }
+  
   const shortURL = generateRandomString();
  
   urlDatabase[shortURL] = { 
@@ -155,7 +160,6 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(403).send("Do not own this url!");
     return;
   }
-
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
