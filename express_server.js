@@ -141,7 +141,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
-  res.redirect("/urls/");
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -159,9 +159,9 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id/edit", (req, res) => {
-  const shortURL = req.params.id;
+  const id = req.params.id;
   const longURL = req.body.longURL;
-  urlDatabase[shortURL].longURL = longURL;
+  urlDatabase[id].longURL = longURL;
   res.redirect("/urls");
 });
 
