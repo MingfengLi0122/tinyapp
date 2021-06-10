@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -16,12 +17,12 @@ const users = {
   aJ48lW: {
     id: "aJ48lW",
     email: "user@example.com",
-    password: "123",
+    password: "$2b$10$AOVC5x0lFdC5BEK6TSb1vOoo3mUI4TflgM5SKa2FNNqcwVefylccu", //original 123123
   },
-  user2RandomID: {
+  as344j: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "123",
+    password: "$2b$10$.2AfTtME1AlqA3ndkQ4AbuvZ0H.bAnCoa7UndQIl2fKlPq/9GvxZy", //original 123321
   },
 };
 
@@ -138,8 +139,9 @@ app.post("/login", (req, res) => {
     res.status(403).send("Unregistered email address!");
     return;
   }
-  
-  if (isNotCorrectPassword(req.body.email, req.body.password)) {
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
+  if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
     res.status(403).send("Wrong password!");
     return;
   }
@@ -168,13 +170,16 @@ app.post("/register", (req, res) => {
 
   const id = generateRandomString();
 
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
   const user = {
     id: id,
     email: req.body.email,
-    password: req.body.password,
+    password: hashedPassword,
   };
 
   users[id] = user;
+
   res.cookie("user_id", id);
   res.redirect("/urls");
 });
@@ -193,17 +198,8 @@ function filter(urlDatabase, userId) {
 
 function checkUserId(email, password) {
   for (let user in users) {
-    if (users[user].email === email && users[user].password === password) {
-      console.log("matched user id:", user);
+    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
       return user;
-    }
-  }
-}
-
-function isNotCorrectPassword(email, password) {
-  for (let user in users) {
-    if (users[user].email === email && users[user].password !== password) {
-      return true;
     }
   }
 }
