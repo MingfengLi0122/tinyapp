@@ -35,8 +35,12 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## How to use TinyAPP
 
-- Register/Login: user need to register and login the page to view, create, edit and delete their own short urls
-- Creat new link: click create a new short link in the nav bar, then ennter the long urls you want to be shorten
-- Edit/Delete: user can edit or delete their own urls on the my url page
-- Share: share your short link `/u/:shortURL` to your firends, it will allow you to redirect the long url assigned with.
-- Please have fun and enjoy! `:hugs::hugs::hugs:`
+####Register/Login####
+- user need to register and login the page to view, create, edit and delete their own short urls
+####Creat new link#### 
+- click create a new short link in the nav bar, then ennter the long urls you want to be shorten
+####Edit/Delete#### 
+- user can edit or delete their own urls on the my url page
+####Share####
+- share your short link `/u/:shortURL` to your firends, it will allow you to redirect the long url assigned with.
+- Please have fun and enjoy! :hugs::hugs::hugs:
