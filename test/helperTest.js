@@ -35,44 +35,34 @@ describe("#getUserByEmail", function() {
     const expectedOutput = "userRandomID";
     assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#getUserByEmail", function() {
   it("shoule return 'user2RandomID'", () => {
     const user = getUserByEmail("user2@example.com", testUsers);
     const expectedOutput = "user2RandomID";
     assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#getUserByEmail", function() {
   it("shoule return 'aJ48lW'", () => {
     const user = getUserByEmail("w@example.com", testUsers);
     const expectedOutput = "aJ48lW";
     assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#getUserByEmail", function() {
   it("shoule return 'jd67j1'", () => {
     const user = getUserByEmail("z@example.com", testUsers);
     const expectedOutput = "jd67j1";
     assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#getUserByEmail", function() {
-  it("shoule not return 'jd67j2'", () => {
+  it("shoule not return 'c8s7j2'", () => {
     const user = getUserByEmail("z@example.com", testUsers);
-    const expectedOutput = "jd67j2";
+    const expectedOutput = "c8s7j2";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#getUserByEmail", function() {
-  it("shoule not return 'jd67j2'", () => {
+  it("shoule not return '8nc7j'", () => {
     const user = getUserByEmail("z@example.com", testUsers);
-    const expectedOutput = "jd67j2";
+    const expectedOutput = "8nc7j";
     assert.notStrictEqual(user, expectedOutput);
   });
 });
@@ -83,34 +73,26 @@ describe("#isRegisted", function() {
     const expectedOutput = "false";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#isRegisted", function() {
-  it("shoule return true", () => {
+  it("shoule not return true", () => {
     const user = isRegisted("user2@example.com", testUsers);
     const expectedOutput = "true";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#isRegisted", function() {
-  it("shoule not return true", () => {
+  it("shoule return false", () => {
     const user = isRegisted("ff@example.com", testUsers);
-    const expectedOutput = "false";
-    assert.notStrictEqual(user, expectedOutput);
+    const expectedOutput = false;
+    assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#isRegisted", function() {
-  it("shoule return true", () => {
+  it("shoule not return true", () => {
     const user = isRegisted("user@example.com", testUsers);
     const expectedOutput = "true";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#isRegisted", function() {
-  it("shoule return true", () => {
+  it("shoule not return true", () => {
     const user = isRegisted("w@example.com", testUsers);
     const expectedOutput = "true";
     assert.notStrictEqual(user, expectedOutput);
@@ -118,31 +100,25 @@ describe("#isRegisted", function() {
 });
 
 describe("#checkUserId", function() {
-  it("shoule return true", () => {
+  it("shoule not return 'aJ48lW'", () => {
     const user = checkUserId("@example.com", "123123", testUsers);
     const expectedOutput = "aJ48lW";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#checkUserId", function() {
-  it("shoule return true", () => {
+  it("shoule not return 'aJlW", () => {
     const user = checkUserId("@ex.com", "123", testUsers);
     const expectedOutput = "aJlW";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#checkUserId", function() {
-  it("shoule return true", () => {
+  it("shoule not return 'sfsf'", () => {
     const user = checkUserId("1@esfx.com", "bklkks", testUsers);
-    const expectedOutput = "aJlW";
+    const expectedOutput = "sfsf";
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#checkUserId", function() {
-  it("shoule return true", () => {
+  it("shoule return 'aJ48lW'", () => {
     const user = checkUserId("w@example.com", "123123", testUsers);
     const expectedOutput = "aJ48lW";
     assert.strictEqual(user, expectedOutput);
@@ -150,42 +126,35 @@ describe("#checkUserId", function() {
 });
 
 describe("#filter", function() {
-  it("shoule return true", () => {
+  it("shoule return undefined", () => {
     const user = checkUserId(testUrls, "67ssj1");
     const expectedOutput = undefined;
     assert.strictEqual(user, expectedOutput);
   });
-});
 
-describe("#filter", function() {
-  it("shoule return true", () => {
+  it("shoule not return {s: 400}", () => {
     const user = filter(testUrls,"jd67j1");
-    const expectedOutput = {};
+    const expectedOutput = {s: 400};
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#filter", function() {
-  it("shoule return true", () => {
+  it("shoule not return {}", () => {
     const user = filter(testUrls,"afs311");
     const expectedOutput = {};
     assert.notStrictEqual(user, expectedOutput);
   });
-});
 
-describe("#filter", function() {
-  it("shoule return true", () => {
+  it("shoule return the expectedOutput", () => {
     const user = filter(testUrls,"aJ48lW");
-    const expectedOutput = {
-      "b6UTxQ": "https://www.tsn.ca",
-      "i3BoGr": "https://www.google.ca"
-    };
-    assert.notStrictEqual(user, expectedOutput);
+    console.log(user);
+    const expectedOutput = { 
+      b6UTxQ: 'https://www.tsn.ca', 
+      i3BoGr: 'https://www.google.ca' 
+    }
+    assert.deepEqual(user, expectedOutput);
   });
-});
 
-describe("#filter", function() {
-  it("shoule return true", () => {
+  it("shoule not return the expectedOutput", () => {
     const user = filter(testUrls,"afs311");
     const expectedOutput = {"jd67j1": {
       id: "jd67j1",
@@ -195,3 +164,4 @@ describe("#filter", function() {
     assert.notStrictEqual(user, expectedOutput);
   });
 });
+
