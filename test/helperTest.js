@@ -29,44 +29,6 @@ const testUrls = {
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
-describe("#getUserByEmail", function() {
-  it("should return 'userRandomID'", () => {
-    const user = getUserByEmail("user@example.com", testUsers);
-    const expectedOutput = "userRandomID";
-    assert.strictEqual(user, expectedOutput);
-  });
-
-  it("shoule return 'user2RandomID'", () => {
-    const user = getUserByEmail("user2@example.com", testUsers);
-    const expectedOutput = "user2RandomID";
-    assert.strictEqual(user, expectedOutput);
-  });
-
-  it("shoule return 'aJ48lW'", () => {
-    const user = getUserByEmail("w@example.com", testUsers);
-    const expectedOutput = "aJ48lW";
-    assert.strictEqual(user, expectedOutput);
-  });
-
-  it("shoule return 'jd67j1'", () => {
-    const user = getUserByEmail("z@example.com", testUsers);
-    const expectedOutput = "jd67j1";
-    assert.strictEqual(user, expectedOutput);
-  });
-
-  it("shoule not return 'c8s7j2'", () => {
-    const user = getUserByEmail("z@example.com", testUsers);
-    const expectedOutput = "c8s7j2";
-    assert.notStrictEqual(user, expectedOutput);
-  });
-
-  it("shoule not return '8nc7j'", () => {
-    const user = getUserByEmail("z@example.com", testUsers);
-    const expectedOutput = "8nc7j";
-    assert.notStrictEqual(user, expectedOutput);
-  });
-});
-
 describe("#isRegisted", function() {
   it("shoule not return true", () => {
     const user = isRegisted("fff@example.com", testUsers);
