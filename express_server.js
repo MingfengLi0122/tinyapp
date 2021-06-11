@@ -67,8 +67,8 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
     return;
   }
-  
-  const templateVars = { urls: urlDatabase, user: users[userID] };
+  let filteredDataBase = filter(urlDatabase, userID);
+  const templateVars = { urls: filteredDataBase, user: users[userID] };
   res.render("urls_new", templateVars);
 });
 
@@ -160,7 +160,13 @@ app.post("/urls/:id/edit", (req, res) => {
   const filteredDataBase = filter(urlDatabase, req.session.user_id);
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
+  const userID = req.session.user_id;
   
+  if (!userID) {
+    res.status(401).send("Not login yet!");
+    return;
+  }
+
   if (!filteredDataBase[shortURL]) {
     res.status(403).send("Do not own this url!");
     return;
