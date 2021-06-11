@@ -33,15 +33,4 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(7);
 }
 
-const getUserByEmail = function(email, database) {
-  let user = "";
-  for (let id in database) {
-    if (database[id].email === email) {
-      user = database[id].id;
-    }
-  }
-  return user;
-}
-
-
-module.exports = { getUserByEmail, generateRandomString, isRegisted, checkUserId, filter };
+module.exports = { generateRandomString, isRegisted, checkUserId, filter };
