@@ -30,5 +30,5 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Helper Function Test
 
-- use `npm start`to run this tinyapp project
-- use `npm test`to run automated testing for helper functions
+- use `npm start` to run this tinyapp project
+- use `npm test` to run automated testing for helper functions
