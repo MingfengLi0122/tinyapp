@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 // urls display page -GET : display users' urls
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  let filteredDataBase = filter(urlDatabase, userID);
+  let filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const templateVars = { urls: filteredDataBase, user: users[userID] };
   if (!userID) {
     res.status(403).send("Not login yet!");
@@ -40,8 +40,8 @@ app.get("/urls", (req, res) => {
 // create new url - GET : validate user is logged in before displaying their own new urls
 app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id
-  let filteredDataBase = filter(urlDatabase, userID);
-  const templateVars = { urls: filteredDataBase, user: users[userID] };
+  let filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
+  const templateVars = { urls: filteredDataBase, user: users[userID] }; 
   if (!userID) {
     res.redirect("/login");
     return;
@@ -51,7 +51,7 @@ app.get("/urls/new", (req, res) => {
 // display short urls - GET: validate user is logged in before displaying their own urls
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
-  const filteredDataBase = filter(urlDatabase, userID);
+  const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const shortURL = req.params.id;
   const id = req.session.user_id;
   if (!userID) {
@@ -119,7 +119,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = req.params.id;
-  const filteredDataBase = filter(urlDatabase, userID);
+  const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   if (!userID) {
     res.status(401).send("Not login yet!");
     return;
@@ -133,7 +133,7 @@ app.post("/urls/:id", (req, res) => {
 // delete urls - POST : check user validation, and delete their own urls
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
-  const filteredDataBase = filter(urlDatabase, userID);
+  const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const shortURL = req.params.id;
   if (!userID) {
     res.status(401).send("Not login yet!");
@@ -148,7 +148,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 // edit urls - POST : check user validation, and edit their own urls
 app.post("/urls/:id/edit", (req, res) => {
-  const filteredDataBase = filter(urlDatabase, req.session.user_id);
+  const filteredDataBase = filter(urlDatabase, req.session.user_id); // filter out the urls which dont belong to user
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
   const userID = req.session.user_id;
@@ -168,7 +168,7 @@ app.post("/login", (req, res) => {
   const inputEmail = req.body.email;
   const inputPassowrd = req.body.password;
   const hashedPassword = bcrypt.hashSync(inputPassowrd, 10);
-  const userId = checkUserId(inputEmail, inputPassowrd, users);
+  const userId = checkUserId(inputEmail, inputPassowrd, users); // get user's id based on email and password
   if (!inputEmail || !inputPassowrd) {
     res.status(400).send("Username/Password can not be empty!");
     return;
@@ -194,7 +194,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Username/Password can not be empty!");
     return;
   }
-  if (isRegisted(inputEmail, users)) {
+  if (isRegisted(inputEmail, users)) { // check email has been resgisted or not
     res.status(400).send("Email address has been registerd!");
     return;
   }
