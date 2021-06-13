@@ -6,10 +6,12 @@ const PORT = 8080;
 const bcrypt = require("bcrypt");
 const morgan = require("morgan");
 const cookieSession = require("cookie-session");
+const methodOverride = require("method-override");
 const { generateRandomString, isRegisted, checkUserId, filter } = require("./helpers");
 const { urlDatabase, users } = require("./database/databaseObj");
 // Set up functions
 app.use(morgan('dev'));
+app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: "session",
@@ -32,7 +34,8 @@ app.get("/urls", (req, res) => {
   let filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const templateVars = { urls: filteredDataBase, user: users[userID] };
   if (!userID) {
-    res.status(403).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   res.render("urls_index", templateVars);
@@ -43,7 +46,8 @@ app.get("/urls/new", (req, res) => {
   let filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const templateVars = { urls: filteredDataBase, user: users[userID] }; 
   if (!userID) {
-    res.redirect("/login");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   res.render("urls_new", templateVars);
@@ -53,28 +57,31 @@ app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const shortURL = req.params.id;
-  const id = req.session.user_id;
   if (!userID) {
-    res.status(403).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!filteredDataBase[shortURL]) {
-    res.status(403).send("Do not own this url!");
+    const error = "Do not own this url!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
     return;
   }
   const templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
-    user: users[id]
+    user: users[userID]
   };
   res.render("urls_show", templateVars);
 });
 // redirect to longURL - GET : redirect to longURL stored in database
 app.get("/u/:id", (req, res) => {
+  const userID = req.session.user_id;
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL].longURL;
   if (!urlDatabase[shortURL]) {
-    res.status(404).send("This url does not exist!");
+    const error = "Do not own this url!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
     return;
   }
   res.redirect(longURL);
@@ -106,7 +113,8 @@ app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   const shortURL = generateRandomString();
   if (!userID ) {
-    res.status(401).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   urlDatabase[shortURL] = { 
@@ -121,43 +129,48 @@ app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   if (!userID) {
-    res.status(401).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!filteredDataBase[shortURL]) {
-    res.status(403).send("Do not own this url!");
+    const error = "Do not own this url!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
     return;
   }
   res.redirect(`/urls/${shortURL}`);
 });
 // delete urls - POST : check user validation, and delete their own urls
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const filteredDataBase = filter(urlDatabase, userID); // filter out the urls which dont belong to user
   const shortURL = req.params.id;
   if (!userID) {
-    res.status(401).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!filteredDataBase[shortURL]) {
-    res.status(403).send("Do not own this url!");
-    return;
+    const error = "Do not own this url!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
   }
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 // edit urls - POST : check user validation, and edit their own urls
-app.post("/urls/:id/edit", (req, res) => {
-  const filteredDataBase = filter(urlDatabase, req.session.user_id); // filter out the urls which dont belong to user
+app.patch("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
   const userID = req.session.user_id;
+  const filteredDataBase = filter(urlDatabase, req.session.user_id); // filter out the urls which dont belong to user
   if (!userID) {
-    res.status(401).send("Not login yet!");
+    const error = "Not login yet!";
+    res.status(401).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!filteredDataBase[shortURL]) {
-    res.status(403).send("Do not own this url!");
+    const error = "Do not own this url!";
+    res.status(403).render("urls_error",  { user: users[userID] , error});
     return;
   }
   urlDatabase[shortURL].longURL = longURL;
@@ -165,20 +178,24 @@ app.post("/urls/:id/edit", (req, res) => {
 });
 // login post - POST: verify users' email and password, then redirect to /urls
 app.post("/login", (req, res) => {
+  const userID = req.session.user_id;
   const inputEmail = req.body.email;
   const inputPassowrd = req.body.password;
   const hashedPassword = bcrypt.hashSync(inputPassowrd, 10);
   const userId = checkUserId(inputEmail, inputPassowrd, users); // get user's id based on email and password
   if (!inputEmail || !inputPassowrd) {
-    res.status(400).send("Username/Password can not be empty!");
+    const error = "Username/Password can not be empty!";
+    res.status(400).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!isRegisted(inputEmail, users)) {
-    res.status(403).send("Unregistered email address!");
+    const error = "Unregistered email address!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (!bcrypt.compareSync(inputPassowrd, hashedPassword)) {
-    res.status(403).send("Wrong Username/Password!");
+    const error = "Wrong Username/Password!";
+    res.status(403).render("urls_error", { user: users[userID] , error});
     return;
   }
   req.session.user_id = userId;
@@ -186,16 +203,19 @@ app.post("/login", (req, res) => {
 });
 // resigter - POST : check validation of users registration, then redirect to /urls
 app.post("/register", (req, res) => {
+  const userID = req.session.user_id;
   const inputEmail = req.body.email;
   const inputPassowrd = req.body.password;
   const id = generateRandomString();
   const hashedPassword = bcrypt.hashSync(inputPassowrd, 10);
   if (!inputEmail || !inputPassowrd) {
-    res.status(400).send("Username/Password can not be empty!");
+    const error = "Username/Password can not be empty!";
+    res.status(400).render("urls_error", { user: users[userID] , error});
     return;
   }
   if (isRegisted(inputEmail, users)) { // check email has been resgisted or not
-    res.status(400).send("Email address has been registerd!");
+    const error = "Email address has been registerd!";
+    res.status(400).render("urls_error", { user: users[userID] , error});
     return;
   }
   const user = {
